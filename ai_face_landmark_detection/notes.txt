@@ -1,0 +1,20 @@
+covred:
+installing facemesh->pre trained tensorfolw library
+building facemesh app
+Detecting your face real time
+
+
+/install dependencies
+ npm install @tensorflow/tfjs
+ npm install @tensorflow-models/facemesh
+ npm install react-webcam
+/import dependencies
+/setup wencam and canvas
+/define reference to those 
+/load facemesh
+/detect function
+/drawing utilities
+/load triangulation
+/setup traingle path
+/setup point drawing
+/add f=drawmwsh to detect function

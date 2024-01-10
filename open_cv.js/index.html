@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenCV Video Processing</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #canvasOutput {
+            border: 1px solid #ccc;
+            margin-top: 20px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <video id="videoInput" width="640" height="480" autoplay></video>
+    <canvas id="canvasOutput" width="640" height="480"></canvas>
+    <button onclick="startProcessing()">Start</button>
+    <button onclick="stopProcessing()">Stop</button>
+
+    <script async src="https://docs.opencv.org/master/opencv.js" onload="onOpenCvReady();" type="text/javascript"></script>
+  <!-- ... Your existing HTML code ... -->
+
+<script>
+    let video = document.getElementById('videoInput');
+    let canvasOutput = document.getElementById('canvasOutput');
+    let src = new cv.Mat(video.height, video.width, cv.CV_8UC4);
+    let dst = new cv.Mat(video.height, video.width, cv.CV_8UC1);
+    let cap = new cv.VideoCapture(video);
+
+    const FPS = 30;
+    let streaming = false; // Move the variable outside of the onOpenCvReady function
+    let processInterval;
+
+    function processVideo() {
+        try {
+            let begin = Date.now();
+            // start processing.
+            cap.read(src);
+            cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY);
+            cv.imshow(canvasOutput, dst);
+            // schedule the next one.
+            let delay = 1000/FPS - (Date.now() - begin);
+            processInterval = setTimeout(processVideo, delay);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    function startProcessing() {
+        if (!streaming) {
+            streaming = true;
+            processVideo();
+        }
+    }
+
+    function stopProcessing() {
+        if (streaming) {
+            streaming = false;
+            clearTimeout(processInterval);
+        }
+    }
+
+    function onOpenCvReady() {
+        video.addEventListener('canplay', function() {
+            streaming = true;
+            processVideo();
+        });
+        
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function (stream) {
+                video.srcObject = stream;
+            })
+            .catch(function (err) {
+                console.error('Error accessing the camera: ', err);
+            });
+    }
+</script>
+
+<!-- ... Your existing HTML code ... -->
+
+</body>
+</html>
